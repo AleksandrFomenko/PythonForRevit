@@ -1,0 +1,44 @@
+import clr
+import System
+clr.AddReference('RevitAPI')
+clr.AddReference("RevitServices")
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+from Autodesk.Revit.ApplicationServices import Application
+from RevitServices.Transactions import TransactionManager
+from Autodesk.Revit import DB
+from Autodesk.Revit.Creation import Application as app2
+
+doc = DocumentManager.Instance.CurrentDBDocument
+app = DocumentManager.Instance.CurrentUIApplication.Application
+
+shared_params_path = r"C:\Users\Александр\Desktop\123\ФОП\ФОП2021.txt"
+app.SharedParametersFilename = shared_params_path
+Data = app.OpenSharedParameterFile()
+
+ar = []
+par_to_add = None
+for gr in Data.Groups.GetEnumerator():
+    if gr.Name == "01 Обязательные ОБЩИЕ":
+        for par in gr.Definitions.GetEnumerator():
+            ar.append(par.Name)
+            if par.Name == "ADSK_Количество":
+                par_to_add = par
+            
+TransactionManager.Instance.EnsureInTransaction(doc)
+
+category = DB.Category.GetCategory(doc, DB.BuiltInCategory.OST_DuctCurves)
+category_set = DB.CategorySet()
+category_set.Insert(category)
+#ToInstance
+instance_binding = DB.InstanceBinding()
+instance_binding.Categories.Insert(category)
+parameter_group = DB.BuiltInParameterGroup.PG_IFC
+new_param = doc.ParameterBindings.Insert(par_to_add,instance_binding,parameter_group)
+#ToType
+#bin = DB.TypeBinding()
+#bin.Categories.Insert(category)
+
+
+TransactionManager.Instance.TransactionTaskDone()        
+
