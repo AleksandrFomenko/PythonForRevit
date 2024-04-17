@@ -12,33 +12,44 @@ from Autodesk.Revit.Creation import Application as app2
 doc = DocumentManager.Instance.CurrentDBDocument
 app = DocumentManager.Instance.CurrentUIApplication.Application
 
-shared_params_path = r"C:\Users\Александр\Desktop\123\ФОП\ФОП2021.txt"
+shared_params_path = r"C:\Users\FomenkoA\Desktop\Новая папка\ФОП\МГЭ.txt"
 app.SharedParametersFilename = shared_params_path
 Data = app.OpenSharedParameterFile()
 
-ar = []
-par_to_add = None
-for gr in Data.Groups.GetEnumerator():
-    if gr.Name == "01 Обязательные ОБЩИЕ":
-        for par in gr.Definitions.GetEnumerator():
-            ar.append(par.Name)
-            if par.Name == "ADSK_Количество":
-                par_to_add = par
+
+class shared_parameter_file:
+    shared_params_path = r"C:\Users\FomenkoA\Desktop\Новая папка\ФОП\МГЭ.txt"
+    app.SharedParametersFilename = shared_params_path
+    def __init__(self):
+        Data = app.OpenSharedParameterFile()
+
+    def get_category(self,categories):
+        category = DB.Category.GetCategory(doc,categories)
+       
+        return category
+
+    def add_parameter_to_instance(self,group_name,parameter_name,category_set):
+        par_to_add = None
+        for group in Data.Groups.GetEnumerator():
+            if group.Name == group_name:
+                for parameter in group.Definitions.GetEnumerator():
+                    if parameter.Name == parameter_name:
+                        par_to_add = parameter
+                        instance_binding = DB.InstanceBinding()
+                        instance_binding.Categories.Insert(category_set)
+                        parameter_group = DB.BuiltInParameterGroup.PG_IFC
+                        new_param = doc.ParameterBindings.Insert(par_to_add,instance_binding,parameter_group)
+
+
+
             
 TransactionManager.Instance.EnsureInTransaction(doc)
-
-category = DB.Category.GetCategory(doc, DB.BuiltInCategory.OST_DuctCurves)
-category_set = DB.CategorySet()
-category_set.Insert(category)
-#ToInstance
-instance_binding = DB.InstanceBinding()
-instance_binding.Categories.Insert(category)
-parameter_group = DB.BuiltInParameterGroup.PG_IFC
-new_param = doc.ParameterBindings.Insert(par_to_add,instance_binding,parameter_group)
+spf = shared_parameter_file()
+cat_set = spf.get_category(DB.BuiltInCategory.OST_DuctCurves)
+spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Количество секций",cat_set)
 #ToType
 #bin = DB.TypeBinding()
 #bin.Categories.Insert(category)
 
 
 TransactionManager.Instance.TransactionTaskDone()        
-
