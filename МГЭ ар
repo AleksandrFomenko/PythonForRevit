@@ -1,0 +1,62 @@
+import clr
+import System
+clr.AddReference('RevitAPI')
+clr.AddReference("RevitServices")
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+from Autodesk.Revit.ApplicationServices import Application
+from RevitServices.Transactions import TransactionManager
+from Autodesk.Revit import DB
+from Autodesk.Revit.DB import FilteredElementCollector as FEC
+
+
+doc = DocumentManager.Instance.CurrentDBDocument
+
+
+class mge_setter:
+    def __init__(self):
+        pass
+    def set_parameter(self,item, parameter_name,value):
+        par = item.LookupParameter(parameter_name)
+        if par and not par.IsReadOnly:
+            par.Set(value)
+    #МГЭ_Наименование
+    def name(self,item):
+        par_name = ("МСК_Наименование")
+        value = "1"
+        self.set_parameter(item,par_name,value)
+    #МГЭ_Предел огнестойкости
+    def fire_limit(self,item):
+        par_name = ("МСК_Предел огнестойкости")
+        value = "1"
+        self.set_parameter(item,par_name,value)
+    #МСК_Признак несущей конструкции
+    def sign_supporting_structure(self,item):
+        par_name = ("МСК_Признак несущей конструкции")
+        value = 1
+        self.set_parameter(item,par_name,value)
+    #МСК_Марка
+    def marka(self,item):
+        par_name = ("МСК_Марка")
+        value = 1
+        self.set_parameter(item,par_name,value)
+    #МСК_Обозначение
+    def designation(self,item):
+        par_name = ("МСК_Обозначение")
+        value = 1
+        self.set_parameter(item,par_name,value)
+
+    def wall_type_setter(self):
+        walls_types = (FEC(doc).
+                            OfClass(DB.WallType).
+                            WhereElementIsElementType().
+                            ToElements()
+                        )
+
+        for item in walls_types:
+            self.sign_supporting_structure(item)
+
+TransactionManager.Instance.EnsureInTransaction(doc)
+ms = mge_setter()
+ms.wall_type_setter()
+TransactionManager.Instance.TransactionTaskDone()        
