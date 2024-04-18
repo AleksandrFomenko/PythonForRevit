@@ -7,49 +7,104 @@ from RevitServices.Persistence import DocumentManager
 from Autodesk.Revit.ApplicationServices import Application
 from RevitServices.Transactions import TransactionManager
 from Autodesk.Revit import DB
+from Autodesk.Revit.DB import FilteredElementCollector as FEC
+from Autodesk.Revit.DB.Mechanical import Duct
 from Autodesk.Revit.Creation import Application as app2
+from System.Collections.Generic import List
 
 doc = DocumentManager.Instance.CurrentDBDocument
 app = DocumentManager.Instance.CurrentUIApplication.Application
-
-shared_params_path = r"C:\Users\FomenkoA\Desktop\Новая папка\ФОП\МГЭ.txt"
-app.SharedParametersFilename = shared_params_path
-Data = app.OpenSharedParameterFile()
-
 
 class shared_parameter_file:
     shared_params_path = r"C:\Users\FomenkoA\Desktop\Новая папка\ФОП\МГЭ.txt"
     app.SharedParametersFilename = shared_params_path
     def __init__(self):
-        Data = app.OpenSharedParameterFile()
+        self.Data = app.OpenSharedParameterFile()
 
-    def get_category(self,categories):
-        category = DB.Category.GetCategory(doc,categories)
-       
-        return category
+    def get_category(self,cat_list):
+        return map(lambda cat: DB.Category.GetCategory(doc,cat),cat_list)
 
-    def add_parameter_to_instance(self,group_name,parameter_name,category_set):
+    def add_parameter_to_instance(self,group_name,parameter_name,categories):
+        par_to_add = None
+        for group in self.Data.Groups.GetEnumerator():
+            if group.Name == group_name:
+                for parameter in group.Definitions.GetEnumerator():
+                    if parameter.Name == parameter_name:
+                        par_to_add = parameter
+                        instance_binding = DB.InstanceBinding()
+                        map(lambda cat:instance_binding.Categories.Insert(cat),categories)
+                        parameter_group = DB.BuiltInParameterGroup.PG_IFC
+                        new_param = doc.ParameterBindings.Insert(par_to_add,instance_binding,parameter_group)
+    def add_parameter_to_type(self,group_name,parameter_name,category_set):
         par_to_add = None
         for group in Data.Groups.GetEnumerator():
             if group.Name == group_name:
                 for parameter in group.Definitions.GetEnumerator():
                     if parameter.Name == parameter_name:
                         par_to_add = parameter
-                        instance_binding = DB.InstanceBinding()
-                        instance_binding.Categories.Insert(category_set)
+                        type_binding = DB.TypeBinding()
+                        type_binding.Categories.Insert(category_set)
                         parameter_group = DB.BuiltInParameterGroup.PG_IFC
-                        new_param = doc.ParameterBindings.Insert(par_to_add,instance_binding,parameter_group)
+                        new_param = doc.ParameterBindings.Insert(par_to_add,type_binding,parameter_group)
 
 
+class ventilation:
+    def __init__(self,shared_parameter_file):
+        self.spf = shared_parameter_file
+    def duct_add_parameters(self):
+        categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,DB.BuiltInCategory.OST_DuctFitting])
+        category = self.spf.get_category(categories)
+        #Pset_DuctSegmentTypeCommon
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Форма воздуховода",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Рабочее давление",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Диаметр или ширина",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Высота",category)
+        #Pset_DuctSegmentOccurrence
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Заводская изоляция",category)
+        #ExpCheck_DuctSegment
+        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Код элемента",category)
+        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Наименование",category)
+        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Марка элемента",category)
+        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Обозначение",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Код материала",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наименование материала",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Толщина материала",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Предел огнестойкости",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Группа горючести материала",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наличие изоляции",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип изоляции",category)
 
-            
+    def duct_fitting_add_parameters(self):
+        category = self.spf.get_category(DB.BuiltInCategory.OST_DuctFitting)
+        #Pset_DuctFittingTypeCommon
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Форма воздуховода",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Рабочее давление",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Диаметр или ширина",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Высота",category)
+        #Pset_DuctFittingOccurrence
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Коэффициент шероховатости",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Заводская изоляция",category)
+        #ExpCheck_DuctFitting
+        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Код элемента",category)
+        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Наименование",category)
+        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Марка элемента",category)
+        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Обозначение",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Код материала",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наименование материала",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Толщина материала",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Предел огнестойкости",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Группа горючести материала",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наличие изоляции",category)
+        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип изоляции",category)
+    
+        
+
+
+    
 TransactionManager.Instance.EnsureInTransaction(doc)
 spf = shared_parameter_file()
-cat_set = spf.get_category(DB.BuiltInCategory.OST_DuctCurves)
-spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Количество секций",cat_set)
-#ToType
-#bin = DB.TypeBinding()
-#bin.Categories.Insert(category)
-
+vent = ventilation(spf)
+vent.duct_add_parameters()
+#vent.duct_fitting_add_parameters()
 
 TransactionManager.Instance.TransactionTaskDone()        
