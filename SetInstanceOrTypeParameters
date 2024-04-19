@@ -32,79 +32,259 @@ class shared_parameter_file:
                     if parameter.Name == parameter_name:
                         par_to_add = parameter
                         instance_binding = DB.InstanceBinding()
-                        map(lambda cat:instance_binding.Categories.Insert(cat),categories)
+                        map(lambda cat:instance_binding.Categories.Insert(cat),self.get_category(categories))
                         parameter_group = DB.BuiltInParameterGroup.PG_IFC
                         new_param = doc.ParameterBindings.Insert(par_to_add,instance_binding,parameter_group)
     def add_parameter_to_type(self,group_name,parameter_name,category_set):
         par_to_add = None
-        for group in Data.Groups.GetEnumerator():
+        for group in self.Data.Groups.GetEnumerator():
             if group.Name == group_name:
                 for parameter in group.Definitions.GetEnumerator():
                     if parameter.Name == parameter_name:
                         par_to_add = parameter
                         type_binding = DB.TypeBinding()
-                        type_binding.Categories.Insert(category_set)
+                        map(lambda cat:type_binding.Categories.Insert(cat),self.get_category(categories))
                         parameter_group = DB.BuiltInParameterGroup.PG_IFC
                         new_param = doc.ParameterBindings.Insert(par_to_add,type_binding,parameter_group)
-
-
-class ventilation:
-    def __init__(self,shared_parameter_file):
-        self.spf = shared_parameter_file
-    def duct_add_parameters(self):
-        categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,DB.BuiltInCategory.OST_DuctFitting])
-        category = self.spf.get_category(categories)
-        #Pset_DuctSegmentTypeCommon
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Форма воздуховода",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Рабочее давление",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Диаметр или ширина",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Высота",category)
-        #Pset_DuctSegmentOccurrence
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Заводская изоляция",category)
-        #ExpCheck_DuctSegment
-        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Код элемента",category)
-        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Наименование",category)
-        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Марка элемента",category)
-        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Обозначение",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Код материала",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наименование материала",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Толщина материала",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Предел огнестойкости",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Группа горючести материала",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наличие изоляции",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип изоляции",category)
-
-    def duct_fitting_add_parameters(self):
-        category = self.spf.get_category(DB.BuiltInCategory.OST_DuctFitting)
-        #Pset_DuctFittingTypeCommon
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Форма воздуховода",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Рабочее давление",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Диаметр или ширина",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Высота",category)
-        #Pset_DuctFittingOccurrence
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Коэффициент шероховатости",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Заводская изоляция",category)
-        #ExpCheck_DuctFitting
-        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Код элемента",category)
-        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Наименование",category)
-        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Марка элемента",category)
-        self.spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Обозначение",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Код материала",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наименование материала",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Толщина материала",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Предел огнестойкости",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Группа горючести материала",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наличие изоляции",category)
-        self.spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип изоляции",category)
-    
-        
-
-
-    
+  
 TransactionManager.Instance.EnsureInTransaction(doc)
-spf = shared_parameter_file()
-vent = ventilation(spf)
-vent.duct_add_parameters()
-#vent.duct_fitting_add_parameters()
 
-TransactionManager.Instance.TransactionTaskDone()        
+spf = shared_parameter_file()
+#МГЭ_Форма воздуховода
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,DB.BuiltInCategory.OST_DuctFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Форма воздуховода",categories)
+#МГЭ_Рабочее давление
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_PipeCurves])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Рабочее давление",categories)
+#МГЭ_Диаметр или ширина
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,DB.BuiltInCategory.OST_DuctFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Диаметр или ширина",categories)
+#МГЭ_Высота
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,DB.BuiltInCategory.OST_DuctFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Высота",categories)
+#МГЭ_Заводская изоляция
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,DB.BuiltInCategory.OST_DuctFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Заводская изоляция",categories)
+#МГЭ_Код элемента
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_PipeCurves,
+                                        DB.BuiltInCategory.OST_PipeFitting,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment,
+                                        DB.BuiltInCategory.OST_ElectricalEquipment,
+                                        DB.BuiltInCategory.OST_CableTray,
+                                        DB.BuiltInCategory.OST_CableTrayFitting,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_LightingFixtures])
+spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Код элемента",categories)
+#МГЭ_Наименование
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_PipeCurves,
+                                        DB.BuiltInCategory.OST_PipeFitting,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment,
+                                        DB.BuiltInCategory.OST_ElectricalEquipment,
+                                        DB.BuiltInCategory.OST_CableTray,
+                                        DB.BuiltInCategory.OST_CableTrayFitting,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_LightingFixtures])
+spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Наименование",categories)
+#МГЭ_Марка элемента
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_PipeCurves,
+                                        DB.BuiltInCategory.OST_PipeFitting,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment,
+                                        DB.BuiltInCategory.OST_ElectricalEquipment,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_LightingFixtures,
+                                        DB.BuiltInCategory.OST_CableTray,
+                                        DB.BuiltInCategory.OST_CableTrayFitting])
+spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Марка элемента",categories)
+#МГЭ_Обозначение
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_PipeCurves,
+                                        DB.BuiltInCategory.OST_PipeFitting,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment,
+                                        DB.BuiltInCategory.OST_ElectricalEquipment,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_LightingFixtures,
+                                        DB.BuiltInCategory.OST_CableTray,
+                                        DB.BuiltInCategory.OST_CableTrayFitting])
+spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Обозначение",categories)
+#МГЭ_Код материала
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_PipeCurves,
+                                        DB.BuiltInCategory.OST_PipeFitting,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment,
+                                        DB.BuiltInCategory.OST_CableTray,
+                                        DB.BuiltInCategory.OST_CableTrayFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Код материала",categories)
+#МГЭ_Наименование материала
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_PipeCurves,
+                                        DB.BuiltInCategory.OST_PipeFitting,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment,
+                                        DB.BuiltInCategory.OST_CableTray,
+                                        DB.BuiltInCategory.OST_CableTrayFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наименование материала",categories)
+#МГЭ_Толщина материала
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_PipeCurves,
+                                        DB.BuiltInCategory.OST_PipeFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Толщина материала",categories)
+#МГЭ_Предел огнестойкости
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_CableTray,
+                                        DB.BuiltInCategory.OST_CableTrayFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Предел огнестойкости",categories)
+#МГЭ_Группа горючести материала
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_PipeCurves,
+                                        DB.BuiltInCategory.OST_PipeFitting,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Группа горючести материала",categories)
+#МГЭ_Наличие изоляции
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_DuctTerminal,
+                                        DB.BuiltInCategory.OST_PipeCurves,
+                                        DB.BuiltInCategory.OST_PipeFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наличие изоляции",categories)
+#МГЭ_Тип изоляции
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
+                                        DB.BuiltInCategory.OST_DuctFitting,
+                                        DB.BuiltInCategory.OST_PipeCurves,
+                                        DB.BuiltInCategory.OST_PipeFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип изоляции",categories)
+#МГЭ_Коэффициент шероховатости
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctFitting])
+spf.add_parameter_to_type("МГЭ_ИОС","МГЭ_Коэффициент шероховатости",categories)
+#МГЭ_Форма устройства
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctTerminal])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Форма устройства",categories)
+#МГЭ_Тип решетки
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctTerminal])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип решетки",categories)
+#МГЭ_Описание
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctTerminal])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Описание",categories)
+#МГЭ_Номинальное давление
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_PipeFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Номинальное давление",categories)
+#МГЭ_Потеря давления
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_PipeFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Потеря давления",categories)
+#МГЭ_Тип расположения
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип расположения",categories)
+#МГЭ_Масса
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Масса",categories)
+#МГЭ_Удельная теплоемкость
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Удельная теплоемкость",categories)
+#МГЭ_Номинальная теплоотдача
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Номинальная теплоотдача",categories)
+#МГЭ_Тип приборов
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип приборов",categories)
+#МГЭ_Мощность в нормальном режиме
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ElectricalEquipment,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Мощность в нормальном режиме",categories)
+#МГЭ_Мощность в режиме тушения пожара
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ElectricalEquipment,
+                                        DB.BuiltInCategory.OST_LightingFixtures,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Мощность в режиме тушения пожара",categories)
+#МГЭ_Основное электрооборудование
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ElectricalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Основное электрооборудование",categories)
+#МГЭ_Класс защиты
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ElectricalEquipment,
+                                        DB.BuiltInCategory.OST_LightingFixtures,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment,
+                                        ])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Класс защиты",categories)
+#МГЭ_Степень защиты от удара
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ElectricalEquipment,
+                                        DB.BuiltInCategory.OST_LightingFixtures,
+                                        DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Степень защиты от удара",categories)
+#МГЭ_Уровень квалификации
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ElectricalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Уровень квалификации",categories)
+#МГЭ_Назначение
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_LightingFixtures])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Назначение",categories)
+#МГЭ_Наружный
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_LightingFixtures])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Наружный",categories)
+#МГЭ_Продолжительность автономной работы
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_LightingFixtures])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Продолжительность автономной работы",categories)
+#МГЭ_Потребляемая мощность
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_LightingFixtures])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Потребляемая мощность",categories)
+#МГЭ_Признак заземления
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_LightingFixtures])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Признак заземления",categories)
+#МГЭ_Коррозийная защита
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_CableTray,
+                                        DB.BuiltInCategory.OST_CableTrayFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Коррозийная защита",categories)
+#МГЭ_Материал перегородки
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_CableTray,
+                                        DB.BuiltInCategory.OST_CableTrayFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Материал перегородки",categories)
+#МГЭ_Тип конструкции
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_CableTray,
+                                        DB.BuiltInCategory.OST_CableTrayFitting])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип конструкции",categories)
+#МГЭ_Производительность
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Производительность",categories)
+#МГЭ_Напор
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Напор",categories)
+#МГЭ_Скорость вращения
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Скорость вращения",categories)
+#МГЭ_Диаметр рабочего колеса
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Диаметр рабочего колеса",categories)
+#МГЭ_Тип основания
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип основания",categories)
+#МГЭ_Тип насоса
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
+spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип насоса",categories)
+
+
+
+
+
+
+
+
+
+
+
+TransactionManager.Instance.TransactionTaskDone()
