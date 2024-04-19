@@ -50,6 +50,68 @@ class shared_parameter_file:
 TransactionManager.Instance.EnsureInTransaction(doc)
 
 spf = shared_parameter_file()
+###СВЕДЕНИЯ О ПРОЕКТЕ
+#МГЭ_Вид строительства
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Вид строительства",categories)
+#МГЭ_Степень огнестойкости
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Степень огнестойкости",categories)
+#МГЭ_Адрес
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Адрес",categories)
+#МГЭ_Отметка уровня нуля проекта
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Отметка нуля проекта",categories)
+#МГЭ_Отметка уровня нуля земли
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Отметка уровня земли",categories)
+#МГЭ_Проектировщик
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Проектировщик",categories)
+#МГЭ_Заказчик
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Заказчик",categories)
+#МГЭ_Наименование проекта
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Наименование проекта",categories)
+#МГЭ_Наименование объекта
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Наименование объекта",categories)
+#МГЭ_Шифр проекта
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Шифр проекта",categories)
+#МГЭ_Корпус
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Корпус",categories)
+#МГЭ_Номер секции
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Номер секции",categories)
+#МГЭ_Количество секций
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Количество секций",categories)
+#МГЭ_Назначение объекта
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
+spf.add_parameter_to_instance("МГЭ_Сведения о проекте","МГЭ_Назначение объекта",categories)
+
+###УРОВНИ
+#МГЭ_Надземный уровень
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_Levels])
+spf.add_parameter_to_instance("МГЭ_Уровни","МГЭ_Надземный уровень",categories)
+#МГЭ_Базовый уровень
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_Levels])
+spf.add_parameter_to_instance("МГЭ_Уровни","МГЭ_Базовый уровень",categories)
+#МГЭ_Система пожаротушения
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_Levels])
+spf.add_parameter_to_instance("МГЭ_Уровни","МГЭ_Система пожаротушения",categories)
+#МГЭ_Наличие АУПТ
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_Levels])
+spf.add_parameter_to_instance("МГЭ_Уровни","МГЭ_Наличие АУПТ",categories)
+#МГЭ_Уровень комфорта
+categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_Levels])
+spf.add_parameter_to_instance("МГЭ_Уровни","МГЭ_Уровень комфорта",categories)
+
+###ИОС
 #МГЭ_Форма воздуховода
 categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,DB.BuiltInCategory.OST_DuctFitting])
 spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Форма воздуховода",categories)
