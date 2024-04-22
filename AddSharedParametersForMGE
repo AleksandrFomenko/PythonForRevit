@@ -139,7 +139,7 @@ categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,DB.Buil
 spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Высота",categories)
 #МГЭ_Заводская изоляция
 categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,DB.BuiltInCategory.OST_DuctFitting])
-spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Заводская изоляция",categories)
+spf.add_parameter_to_type("МГЭ_ИОС","МГЭ_Заводская изоляция",categories)
 #МГЭ_Код элемента
 categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
                                         DB.BuiltInCategory.OST_DuctFitting,
