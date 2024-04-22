@@ -22,7 +22,11 @@ class shared_parameter_file:
         self.Data = app.OpenSharedParameterFile()
 
     def get_category(self,cat_list):
-        return map(lambda cat: DB.Category.GetCategory(doc,cat),cat_list)
+        if cat_list[0] and isinstance(cat_list[0],DB.Category):
+            return [cat for cat in cat_list if cat.AllowsBoundParameters]
+        else:
+            return map(lambda cat: DB.Category.GetCategory(doc,cat),cat_list)
+
 
     def add_parameter_to_instance(self,group_name,parameter_name,categories):
         par_to_add = None
@@ -50,6 +54,13 @@ class shared_parameter_file:
 TransactionManager.Instance.EnsureInTransaction(doc)
 
 spf = shared_parameter_file()
+all_categories = doc.Settings.Categories
+###IFC
+#ifcExportAs
+all_categories  = doc.Settings.Categories
+categories = [cat for cat in all_categories if cat.CategoryType == DB.CategoryType.Model]
+
+spf.add_parameter_to_type("IFC","IfcExportAs",categories)
 ###СВЕДЕНИЯ О ПРОЕКТЕ
 #МГЭ_Вид строительства
 categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_ProjectInformation])
@@ -143,17 +154,9 @@ categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
                                         DB.BuiltInCategory.OST_LightingFixtures])
 spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Код элемента",categories)
 #МГЭ_Наименование
-categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
-                                        DB.BuiltInCategory.OST_DuctFitting,
-                                        DB.BuiltInCategory.OST_DuctTerminal,
-                                        DB.BuiltInCategory.OST_PipeCurves,
-                                        DB.BuiltInCategory.OST_PipeFitting,
-                                        DB.BuiltInCategory.OST_MechanicalEquipment,
-                                        DB.BuiltInCategory.OST_ElectricalEquipment,
-                                        DB.BuiltInCategory.OST_CableTray,
-                                        DB.BuiltInCategory.OST_CableTrayFitting,
-                                        DB.BuiltInCategory.OST_DuctTerminal,
-                                        DB.BuiltInCategory.OST_LightingFixtures])
+all_categories  = doc.Settings.Categories
+categories = [cat for cat in all_categories if cat.CategoryType == DB.CategoryType.Model]
+
 spf.add_parameter_to_instance("МГЭ_Общие","МГЭ_Наименование",categories)
 #МГЭ_Марка элемента
 categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
@@ -338,15 +341,5 @@ spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип основания"
 #МГЭ_Тип насоса
 categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_MechanicalEquipment])
 spf.add_parameter_to_instance("МГЭ_ИОС","МГЭ_Тип насоса",categories)
-
-
-
-
-
-
-
-
-
-
 
 TransactionManager.Instance.TransactionTaskDone()
