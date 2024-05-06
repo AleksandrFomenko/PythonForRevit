@@ -1,0 +1,80 @@
+#для сметы
+import clr
+import System
+clr.AddReference('RevitAPI')
+clr.AddReference("RevitServices")
+import RevitServices
+from Autodesk.Revit.ApplicationServices import Application
+from Autodesk.Revit import DB
+from Autodesk.Revit.DB import FilteredElementCollector as FEC
+from System.Collections.Generic import List
+
+_lvl_par_name_ = "тест для уровня"
+_material_value_par_name_ = "тест для объема"
+
+app = doc.Application
+class units:
+    def __init__(self) -> None:
+        pass
+    def _сubic_foot_to_meter(self,value) -> float:
+        if int(app.VersionNumber) <= 2021:
+            return DB.UnitUtils.ConvertFromInternalUnits(value,DB.DisplayUnitType.DUT_CUBIC_METERS)
+        else:
+            return DB.UnitUtils.ConvertFromInternalUnits(value,DB.UnitTypeId.CubicMeters)
+        
+    def _set_value_to_par(self,item,parameter_name,value) -> None:
+        par = item.LookupParameter(parameter_name)
+        if par and not par.IsReadOnly:
+            if par.StorageType == DB.StorageType.String:
+                par.Set(str(value))
+                return
+            if par.StorageType == DB.StorageType.Integer:
+                par.Set(value)
+                return
+            if par.StorageType == DB.StorageType.Double:
+                par.Set(value)
+                return
+
+
+
+class smeta:
+    _landings_ = (
+        FEC(doc).OfCategory(DB.BuiltInCategory.OST_StairsLandings).
+        WhereElementIsNotElementType().
+        ToElements()
+    )
+    _runs_ = (
+        FEC(doc).OfCategory(DB.BuiltInCategory.OST_StairsRuns).
+        WhereElementIsNotElementType().
+        ToElements()
+    )
+    un = units()
+
+    def __init__(self) -> None:
+        pass
+    def set_material_area(self, item) -> None:
+        for material_id in item.GetMaterialIds(False):
+            material_volume = item.GetMaterialVolume(material_id)
+            value = smeta.un._сubic_foot_to_meter(material_volume)
+            smeta.un._set_value_to_par(item, _material_value_par_name_, value)
+    def set_lvl(self, item) -> None:
+        stairs_main = item.GetStairs()
+        lvl_str = stairs_main.get_Parameter(DB.BuiltInParameter.STAIRS_BASE_LEVEL_PARAM).AsValueString()
+        smeta.un._set_value_to_par(item, _lvl_par_name_, lvl_str)
+
+    def execute_landings(self) -> None:
+         for item in smeta._landings_:
+             self.set_material_area(item)
+             self.set_lvl(item)
+    def execute_runs(self) -> None:
+         for item in smeta._runs_:
+             self.set_material_area(item)
+             self.set_lvl(item)
+
+
+with DB.Transaction(doc,"qwe") as t:
+    t.Start()
+    sm = smeta()
+    sm.execute_landings()
+    sm.execute_runs()
+    t.Commit()
