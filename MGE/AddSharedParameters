@@ -13,7 +13,8 @@ shared_params_path = r"C:\Users\FomenkoA\Desktop\Новая папка\ФОП\М
 adsk_name = "ADSK_Наименование"
 
 # Parameters to add
-parameters_all = ["Семейство и типоразмер", adsk_name, "IfcExportAs", "IfcExportType"]
+parameters_all = ["Семейство и типоразмер", adsk_name, "IfcExportAs", "IfcExportType", "МГЭ_Наименование",
+                  "МГЭ_Код элемента"]
 
 parameters_project_information = ["МГЭ_Вид строительства", "МГЭ_Степень огнестойкости", "МГЭ_Адрес",
                                   "МГЭ_Отметка нуля проекта", "МГЭ_Отметка уровня земли", "МГЭ_Проектировщик",
@@ -64,6 +65,26 @@ parameters_air_terminal = ["Семейство и типоразмер", adsk_na
                            "МГЭ_Тип решетки", "МГЭ_Наличие изоляции", "МГЭ_Наименование", "МГЭ_Код элемента",
                            "МГЭ_Описание", "МГЭ_Марка элемента", "МГЭ_Обозначение", "МГЭ_Код материала",
                            "МГЭ_Наименование материала", "МГЭ_Группа горючести материала"]
+
+parameters_electrical_equipment = ["Семейство и типоразмер", adsk_name, "IfcExportAs", "IfcExportType",
+                                   "МГЭ_Мощность в нормальном режиме", "МГЭ_Мощность в режиме тушения пожара",
+                                   "МГЭ_Класс защиты", "МГЭ_Степень защиты от удара", "МГЭ_Основное электрооборудование",
+                                   "МГЭ_Уровень квалификации", "МГЭ_Наименование", "МГЭ_Код элемента",
+                                   "МГЭ_Марка элемента", "МГЭ_Обозначение"]
+
+parameters_Lighting_fixtures = ["Семейство и типоразмер", adsk_name, "IfcExportAs", "IfcExportType",
+                                "МГЭ_Потребляемая мощность", "МГЭ_Мощность в режиме тушения пожара",
+                                "МГЭ_Признак заземления", "МГЭ_Класс защиты", "МГЭ_Степень защиты от удара",
+                                "МГЭ_Наименование", "МГЭ_Код элемента","МГЭ_Марка элемента",
+                                "МГЭ_Обозначение", "МГЭ_Назначение", "МГЭ_Наружный",
+                                "МГЭ_Продолжительность автономной работы"]
+
+parameters_cable_tray = ["Семейство и типоразмер", adsk_name, "IfcExportAs", "IfcExportType", "МГЭ_Наименование",
+                         "МГЭ_Код элемента", "МГЭ_Марка элемента", "МГЭ_Обозначение", "МГЭ_Тип конструкции",
+                         "МГЭ_Предел огнестойкости", "МГЭ_Код материала", "МГЭ_Наименование материала",
+                         "МГЭ_Материал перегородки", "МГЭ_Коррозийная защита"]
+
+
 
 
 class SharedParameterManager:
@@ -139,6 +160,8 @@ class SharedParameterManager:
 
         self.add_parameter_to_type("IfcExportAs", categories)
         self.add_parameter_to_type("IfcExportType", categories)
+        self.add_parameter_to_type("МГЭ_Наименование", categories)
+        self.add_parameter_to_type("МГЭ_Код элемента", categories)
         # ИОС
         # МГЭ_Форма воздуховода
         categories = List[DB.BuiltInCategory]([DB.BuiltInCategory.OST_DuctCurves,
@@ -509,6 +532,17 @@ class SchedulerManager:
         self.create_scheduler(DB.BuiltInCategory.OST_DuctTerminal, "МГЭ_Воздухораспределительные устройства",
                               parameters_air_terminal, False)
 
+    def create_schedulers_electro(self):
+        self.create_scheduler(DB.BuiltInCategory.OST_ElectricalEquipment, "МГЭ_Электрооборудование",
+                              parameters_electrical_equipment, False)
+
+        self.create_scheduler(DB.BuiltInCategory.OST_LightingFixtures, "МГЭ_Осветительные приборы",
+                              parameters_Lighting_fixtures, False)
+
+        self.create_scheduler(DB.BuiltInCategory.OST_CableTray, "МГЭ_Кабельные лотки",
+                              parameters_cable_tray, False)
+        self.create_scheduler(DB.BuiltInCategory.OST_CableTrayFitting, "МГЭ_Соединительные детали кабельных лотков",
+                              parameters_cable_tray, False)
 
 def add_parameters():
     with DB.Transaction(doc, "add parameters for mge") as t:
@@ -519,16 +553,20 @@ def add_parameters():
         spf.add_parameters_levels()
         spf.add_parameters_ios()
 
+
         t.Commit()
 
 
 def create_schedulers():
     with DB.Transaction(doc, "Create Schedulers") as t:
         t.Start()
+
         scheduler_manager = SchedulerManager()
         scheduler_manager.create_schedulers_general()
         scheduler_manager.create_schedulers_pipe()
         scheduler_manager.create_schedulers_duct()
+        scheduler_manager.create_schedulers_electro()
+
         t.Commit()
 
 
