@@ -1,0 +1,31 @@
+import clr
+
+clr.AddReference('RevitAPI')
+clr.AddReference('RevitServices')
+clr.AddReference('System.Reflection')
+
+from RevitServices.Persistence import DocumentManager
+from Autodesk.Revit.DB import Document, ElementId
+import System.Reflection
+
+
+
+element_id = ElementId(2686)
+my_element = doc.GetElement(element_id)
+my_type = my_element.GetType()
+
+
+binding_flags = (
+    System.Reflection.BindingFlags.Instance |
+    System.Reflection.BindingFlags.Static |
+    System.Reflection.BindingFlags.NonPublic
+)
+
+
+methods = my_type.GetMethods(binding_flags)
+
+
+for method in methods:
+    print(f"{method.Name} - {method.Attributes}")
+
+print(type(my_element))
