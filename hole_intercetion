@@ -1,0 +1,133 @@
+import clr
+
+clr.AddReference('RevitAPI')
+
+from Autodesk.Revit import DB
+from Autodesk.Revit.DB import FilteredElementCollector as FEC
+
+from System.Collections.Generic import List
+from abc import ABC, abstractmethod
+
+
+parameter_name = "тест"
+parameter_value = "000001"
+
+class IHole(ABC):
+    @abstractmethod
+    def get_items(self):
+        pass
+
+    @abstractmethod
+    def get_links(self):
+        pass
+
+
+class HoleIntersection:
+    def __init__(self):
+        pass
+
+    def get_items(self):
+        inter = self.items_intersection()
+
+        all_items = FEC(doc).\
+            OfCategory(DB.BuiltInCategory.OST_GenericModel).\
+            WhereElementIsNotElementType().\
+            ToElementIds()
+
+        filtered_items = [item for item in all_items if item not in inter]
+
+        return list(map(lambda x: doc.GetElement(x), filtered_items))
+
+
+
+    def get_links(self):
+        links = [link
+                 for link
+                 in (
+                     FEC(doc).
+                     OfCategory(DB.BuiltInCategory.OST_RvtLinks).
+                     WhereElementIsNotElementType().
+                     ToElements()
+                 )
+                 ]
+        return links
+
+    def items_intersection(self):
+        links = self.get_links()
+
+        items_result = list()
+
+        target_categories = [
+            DB.BuiltInCategory.OST_PipeCurves,
+            DB.BuiltInCategory.OST_DuctCurves
+        ]
+        category_ids = List[DB.BuiltInCategory](target_categories)
+        category_filter = DB.ElementMulticategoryFilter(category_ids)
+
+        def process_item_link(item_link, link):
+            transform = link.GetTransform()
+
+            bb = item_link.get_BoundingBox(None)
+
+            if not bb:
+                return
+            bb_min = transform.OfPoint(bb.Min)
+            bb_max = transform.OfPoint(bb.Max)
+
+            outline = DB.Outline(bb_min, bb_max)
+            bounding_box_filter = DB.BoundingBoxIntersectsFilter(outline)
+
+            intersecting_elements = FEC(doc) \
+                .OfCategory(DB.BuiltInCategory.OST_GenericModel) \
+                .WherePasses(bounding_box_filter) \
+                .WhereElementIsNotElementType() \
+                .ToElementIds()
+
+            for elem in intersecting_elements:
+                if elem not in items_result:
+                    items_result.Add(elem)
+
+        for link in links:
+            if not link:
+                continue
+            link_doc = link.GetLinkDocument()
+            if not link_doc:
+                continue
+            items_link = FEC(link_doc) \
+                .WherePasses(category_filter) \
+                .WhereElementIsNotElementType() \
+                .ToElements()
+
+            for item_link in items_link:
+                process_item_link(item_link, link)
+
+        return items_result
+
+
+class HoleManager:
+    def __init__(self, ihole: IHole):
+        self.ihole = ihole
+
+    def set_parameter(self, item: DB.Element, parameter_name: str, value: str) -> None:
+
+        par = item.LookupParameter(parameter_name)
+        if par and not par.IsReadOnly:
+            par.Set(value)
+            return
+
+        par_type = doc.GetElement(item.GetTypeId()).LookupParameter(parameter_name)
+        if par_type and not par_type.IsReadOnly:
+            par_type.Set(value)
+
+    def Execute(self):
+        items = self.ihole.get_items()
+
+        for item in items:
+            self.set_parameter(item, parameter_name, parameter_value)
+
+with DB.Transaction(doc, "выа") as tr:
+    tr.Start()
+    hole_intersection = HoleIntersection()
+    hole_manager = HoleManager(hole_intersection)
+    hole_manager.Execute()
+    tr.Commit()
